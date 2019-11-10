@@ -126,7 +126,7 @@ public class Test {
 		DatagramPacket q = new DatagramPacket(rxdata,rxdata.length);
 		r.setSoTimeout(2000);
 		
-		 AudioFormat format = new AudioFormat(4000,8,1,true,false);
+		 AudioFormat format = new AudioFormat(8000,8,1,true,false);
 		 SourceDataLine sourceLine = AudioSystem.getSourceDataLine(format);
 		 sourceLine.open();
 		 BlockingQueue<byte[]> out = new LinkedBlockingQueue<byte[]>();
@@ -140,12 +140,13 @@ public class Test {
 				 sourceLine.start();
 				  
 					try {
+						System.out.println(out.size());
 						byte[] tmp = out.poll(100,TimeUnit.MILLISECONDS);
 						if(tmp==null) {
 							sourceLine.stop();
 							break;
 						}
-						sourceLine.write(tmp, 0, 128);
+						sourceLine.write(tmp, 0, 256);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -166,10 +167,12 @@ public class Test {
 					
 					r.receive(q);
 					
-					for(int i=0;i<128;i++) {						
+					for(int i=0;i<128;i++) {
+						
 							byte firstNumber = (byte) ((rxdata[i] >> 4) & (byte) 0x0F);
 						    byte secondNumber = (byte) (rxdata[i] & 0x0F);
-						    tmp[i] = (byte)(firstNumber-8);
+						    
+						    tmp[i*2] = (byte)(firstNumber-8);
 						    tmp[i*2+1] = (byte)(secondNumber-8);
 						
 					}
